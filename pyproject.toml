@@ -1,0 +1,109 @@
+[tool.poetry]
+name = "no-log-tears"
+version = "0.1.0"
+description = "NoLogTears is a simple extension of Python's built-in logging library, designed to make logging easier, more efficient, and headache-free—no more tears over log management."
+authors = ["zerlok <danil.troshnev@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "no_log_tears"}]
+keywords = [
+    "python",
+    "logging",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Topic :: System :: Logging",
+    "Typing :: Typed",
+]
+
+[tool.poetry.urls]
+Homepage = "https://github.com/zerlok/no-log-tears"
+Issues = "https://github.com/zerlok/no-log-tears/issues"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pydantic = {version = "^2.10.6", optional = true}
+pydantic-settings = {extras = ["yaml"], version = "^2.7.1", optional = true}
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.15.0"
+ruff = "^0.9.6"
+pytest = "^8.3.4"
+pytest-cov = "^6.0.0"
+types-pyyaml = "^6.0.12.20241230"
+
+[tool.poetry.extras]
+all = ["pydantic", "pydantic-settings", "PyYAML"]
+
+[tool.ruff]
+target-version = "py39"
+include = ["src/**/*.py", "tests/**/*.py"]
+line-length = 120
+output-format = "pylint"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "ANN", # because we use mypy
+    "D", # TODO: add docstrings to public code
+    "FA", # TODO: consider should we use __annotations__
+    "TD", # no task tracking
+    "FIX", # TODO: consider enable it against new code on pull requests
+    "COM812", # because ruff format suggests to skip it
+    "ISC001", # because ruff format suggests to skip it
+    "RET505", # clashes with mypy exhaustiveness check
+    "S101", # allow asserts for tests checks and mypy help
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+    "ARG001", # it's ok to use a fixture with a side effect in a test.
+    "PT004", # fixture may add side effect and doesn't return anything.
+]
+
+
+[tool.mypy]
+files = ["src", "tests"]
+
+strict = true
+disallow_any_unimported = true
+disallow_any_expr = true
+disallow_any_decorated = true
+disallow_any_explicit = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_return_any = true
+warn_unreachable = true
+strict_equality = true
+strict_optional = true
+enable_error_code = [
+    "redundant-self",
+    "redundant-expr",
+    "possibly-undefined",
+    "truthy-bool",
+    "truthy-iterable",
+    "ignore-without-code",
+    "unused-awaitable",
+    "explicit-override",
+    "mutable-override",
+    "unimported-reveal",
+    "narrowed-type-not-subtype",
+]
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_any_expr = false
+disallow_any_decorated = false
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
