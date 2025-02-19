@@ -27,7 +27,7 @@ _DEFAULT_CONFIG = DictConfigurator.create_default()
             None,
             {
                 **_DEFAULT_CONFIG,
-                "root": {"level": "INFO", "handlers": ["stderr"]},
+                "root": {"level": "INFO", "handlers": ["console"]},
             },
             id="env patch root level",
         ),
@@ -51,15 +51,15 @@ _DEFAULT_CONFIG = DictConfigurator.create_default()
         ),
         pytest.param(
             {
-                "LOGGING__HANDLERS__STDOUT__FORMATTER": "verbose",
+                "LOGGING__HANDLERS__CONSOLE__FORMATTER": "verbose",
             },
             None,
             {
                 **_DEFAULT_CONFIG,
                 "handlers": {
                     **_DEFAULT_CONFIG["handlers"],  # type: ignore[dict-item]
-                    "stdout": {
-                        **_DEFAULT_CONFIG["handlers"]["stdout"],  # type: ignore[index]
+                    "console": {
+                        **_DEFAULT_CONFIG["handlers"]["console"],  # type: ignore[index]
                         "formatter": "verbose",
                     },
                 },
@@ -71,7 +71,7 @@ _DEFAULT_CONFIG = DictConfigurator.create_default()
             {"root": {"level": "INFO"}},
             {
                 **_DEFAULT_CONFIG,
-                "root": {"level": "INFO", "handlers": ["stderr"]},
+                "root": {"level": "INFO", "handlers": ["console"]},
             },
             id="yaml patch root level",
         ),
@@ -80,7 +80,7 @@ _DEFAULT_CONFIG = DictConfigurator.create_default()
             {"root": {"level": "INFO"}},
             {
                 **_DEFAULT_CONFIG,
-                "root": {"level": "DEBUG", "handlers": ["stderr"]},
+                "root": {"level": "DEBUG", "handlers": ["console"]},
             },
             id="env=DEBUG, yaml=INFO",
         ),

@@ -69,15 +69,14 @@ class DictConfigurator(BaseDictConfigurator):
 
         Handlers:
 
-            * `stdout` -- log to stdout, uses `brief` formatter by default.
-            * `stderr` -- log to stderr, uses `brief` formatter by default.
+            * `console` -- log to stderr, uses `brief` formatter by default.
 
         Default configuration can be overridden by providing custom values or environment variables.
 
         Environment variables:
 
             * `LOGGING__FORMATTER` -- default formatter name, (default `brief`)
-            * `LOGGING__HANDLER` -- default handler name, (default `stderr`)
+            * `LOGGING__HANDLER` -- default handler name, (default `console`)
             * `LOGGING__LEVEL` -- default root logger level, (default `WARNING`)
             * `LOGGING__TRACEBACK` -- default traceback tail length, (default `100`)
         """
@@ -91,8 +90,36 @@ class DictConfigurator(BaseDictConfigurator):
                 },
                 "verbose": {
                     "()": f"{SoftFormatter.__module__}.{SoftFormatter.__name__}",
-                    "fmt": "%(asctime)s|%(levelname)s|%(process)s|%(thread)s|%(taskName)s|%(name)s|%(self)s"
-                    "|%(funcName)s|%(pathname)s:%(lineno)s|%(message)s",
+                    "fmt": "|".join(
+                        f"%({field})s"
+                        for field in (
+                            "asctime",
+                            "created",
+                            "msecs",
+                            "relativeCreated",
+                            "levelname",
+                            "levelno",
+                            "process",
+                            "processName",
+                            "thread",
+                            "threadName",
+                            "taskName",
+                            "name",
+                            "module",
+                            "self",
+                            "funcName",
+                            "pathname",
+                            "lineno",
+                            "filename",
+                            "message",
+                            "msg",
+                            "args",
+                            "exc_text",
+                            "exc_info",
+                            "stack_info",
+                            "__other__",
+                        )
+                    ),
                     "traceback_tail": None,
                 },
                 "json": {
@@ -101,12 +128,7 @@ class DictConfigurator(BaseDictConfigurator):
                 },
             },
             "handlers": {
-                "stdout": {
-                    "class": "logging.StreamHandler",
-                    "formatter": formatter or os.getenv("LOGGING__FORMATTER", "brief"),
-                    "stream": "ext://sys.stdout",
-                },
-                "stderr": {
+                "console": {
                     "class": "logging.StreamHandler",
                     "formatter": formatter or os.getenv("LOGGING__FORMATTER", "brief"),
                     "stream": "ext://sys.stderr",
@@ -115,7 +137,7 @@ class DictConfigurator(BaseDictConfigurator):
             "loggers": {},
             "root": {
                 "level": level or os.getenv("LOGGING__LEVEL", "WARNING"),
-                "handlers": [handler or os.getenv("LOGGING__HANDLER", "stderr")],
+                "handlers": [handler or os.getenv("LOGGING__HANDLER", "console")],
             },
             "incremental": False,
             "disable_existing_loggers": False,

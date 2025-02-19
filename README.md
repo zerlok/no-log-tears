@@ -63,13 +63,12 @@ root:
   handlers: [ console ]
 handlers:
   console:
-    class: logging.StreamHandler
     formatter: custom
     stream: ext://sys.stdout
 formatters:
   custom:
     (): no_log_tears.formatters.SomeFormatter
-    fmt: '%(asctime)s %(levelname)s %(message)s %(my_field)s'
+    fmt: '%(asctime)s %(levelname)s %(message)s %(my_field)s %(__other__)s'
 ```
 
 ```python
@@ -77,8 +76,8 @@ formatters:
 from no_log_tears import get_logger
 
 log = get_logger(__name__)
-log.info("Hello, world!", my_field="my_value")
-# Output: `2025-02-19 20:42:28,928 INFO Hello, world! my_value`
+log.info("Hello, world!", my_field="my_value", my_other_field="my_other_value")
+# Output: `2025-02-19 20:42:28,928 INFO Hello, world! my_value {'my_other_field': 'my_other_value'}`
 ```
 
 Use the `LogMixin` class to easily log messages with additional context:
