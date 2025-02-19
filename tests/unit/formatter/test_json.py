@@ -1,5 +1,6 @@
 import json
 import logging
+import sys
 import typing as t
 from unittest.mock import ANY
 
@@ -40,6 +41,7 @@ from no_log_tears.record import Record
                 "processName": "MainProcess",
                 "relativeCreated": ANY,
                 "stack_info": None,
+                "taskName": None,
                 "thread": ANY,
                 "threadName": "MainThread",
             },
@@ -76,6 +78,7 @@ from no_log_tears.record import Record
                 "processName": "MainProcess",
                 "relativeCreated": ANY,
                 "stack_info": None,
+                "taskName": None,
                 "thread": ANY,
                 "threadName": "MainThread",
             },
@@ -85,8 +88,11 @@ from no_log_tears.record import Record
 def test_json_format_ok(
     formatter: JSONFormatter,
     record: Record,
-    expected_json: t.Mapping[str, object],
+    expected_json: t.Dict[str, object],
 ) -> None:
+    if sys.version_info < (3, 12):
+        expected_json.pop("taskName", None)
+
     assert json.loads(formatter.format(record)) == expected_json
 
 

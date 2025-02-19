@@ -61,7 +61,7 @@ class Logger(
 
     @override
     def process(self, msg: str, kwargs: t.Mapping[str, object]) -> tuple[str, t.MutableMapping[str, object]]:
-        return msg, {"extra": dict(**self.extra, **kwargs)}
+        return msg, {"extra": dict(**self.extra, **kwargs) if self.extra else kwargs}
 
     def with_extra(self, extra: t.Optional[t.Mapping[str, object]]) -> Logger:
         """
@@ -74,7 +74,7 @@ class Logger(
 
         return Logger(
             logger=self.logger,
-            extra=dict(**self.extra, **(extra or {})),
+            extra=dict(**self.extra, **extra) if self.extra else extra,
         )
 
 
