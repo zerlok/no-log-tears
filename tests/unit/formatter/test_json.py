@@ -1,7 +1,6 @@
 import json
 import logging
 import sys
-import typing as t
 from unittest.mock import ANY
 
 import pytest
@@ -88,7 +87,7 @@ from no_log_tears.record import Record
 def test_json_format_ok(
     formatter: JSONFormatter,
     record: Record,
-    expected_json: t.Dict[str, object],
+    expected_json: dict[str, object],
 ) -> None:
     if sys.version_info < (3, 12):
         expected_json.pop("taskName", None)
