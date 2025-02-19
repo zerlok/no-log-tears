@@ -1,3 +1,4 @@
+import sys
 import traceback
 import typing as t
 from itertools import chain
@@ -62,11 +63,14 @@ def test_traceback_is_limited(
 
     # 1) each call stack is printed in 2 lines (File + code preview), thus divide lines by 2.
     # 2) `traceback_tail` applies for top and lower part of traceback, thus multiply it by 2.
+    # *) +1 for extra line `~~~~^^^` in python 3.13 and higher.
+    ratio = 2 + (sys.version_info >= (3, 13))
+
     # 3) extra middle `x{N} items`, thus +1.
-    assert len(lines) // 2 == traceback_tail * 2 + 1
+    assert len(lines) // 2 == traceback_tail * ratio + 1
 
     # each stack frame has 2 lines in traceback.
-    assert lines[len(lines) // 2 - 1] == f"  ... (x{(len(exc_info_lines) - len(lines)) // 2 + 1} stack frames)"
+    assert lines[len(lines) // 2 - 1] == f"  ... (x{(len(exc_info_lines) - len(lines)) // ratio + 1} stack frames)"
 
 
 @pytest.fixture

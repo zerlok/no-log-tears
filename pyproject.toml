@@ -105,6 +105,31 @@ enable_error_code = [
     "narrowed-type-not-subtype",
 ]
 
+[tool.pytest.ini_options]
+pythonpath = [
+    "src",
+]
+addopts = [
+    "--cov=src",
+    "--cov-report=term-missing",
+]
+testpaths = [
+    "tests",
+]
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "@abc.abstractmethod",
+    "if __name__ == .__main__.:",
+    "if t.TYPE_CHECKING:",
+]
+show_missing = true
+
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
