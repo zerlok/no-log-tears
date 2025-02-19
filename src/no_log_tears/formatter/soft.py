@@ -14,6 +14,7 @@ class SoftFormatter(TracebackFormatter):
     Soft formatter to format log records with string interpolation.
 
     Uses `%(field_name)s` syntax.
+
     If field is missing - uses default value or `???` if default is not provided.
     """
 

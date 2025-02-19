@@ -71,10 +71,12 @@ ignore = [
 [tool.mypy]
 files = ["src", "tests"]
 
-strict = true
+# NOTE: it's hard to disallow any expr, any decorated, any explicit when working with logging library.
 disallow_any_expr = false
 disallow_any_decorated = false
 disallow_any_explicit = false
+
+strict = true
 disallow_any_unimported = true
 disallow_any_generics = true
 disallow_subclassing_any = true
@@ -102,11 +104,6 @@ enable_error_code = [
     "unimported-reveal",
     "narrowed-type-not-subtype",
 ]
-
-[[tool.mypy.overrides]]
-module = ["tests.*"]
-disallow_any_expr = false
-disallow_any_decorated = false
 
 [build-system]
 requires = ["poetry-core"]

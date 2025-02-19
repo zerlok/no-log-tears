@@ -10,6 +10,9 @@ from typing_extensions import override
 from no_log_tears.formatter.json import JSONFormatter
 from no_log_tears.formatter.soft import SoftFormatter
 
+LoggingLevelName = t.Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+LoggingLevelOrName = t.Union[int, LoggingLevelName]
+
 
 def is_autoload_enabled() -> bool:
     """
@@ -17,7 +20,7 @@ def is_autoload_enabled() -> bool:
 
     Default = 1.
     """
-    return int(os.getenv("LOGGING.AUTOLOAD", "1")) > 0
+    return int(os.getenv("LOGGING__AUTOLOAD", "1")) > 0
 
 
 def is_debug_enabled() -> bool:
@@ -26,7 +29,7 @@ def is_debug_enabled() -> bool:
 
     Default = 0.
     """
-    return int(os.getenv("LOGGING.DEBUG", "0")) > 0
+    return int(os.getenv("LOGGING__DEBUG", "0")) > 0
 
 
 def is_patch_enabled() -> bool:
@@ -35,7 +38,7 @@ def is_patch_enabled() -> bool:
 
     Default = 1.
     """
-    return int(os.getenv("LOGGING.PATCH", "1")) > 0
+    return int(os.getenv("LOGGING__PATCH", "1")) > 0
 
 
 class DictConfigurator(BaseDictConfigurator):
@@ -46,9 +49,17 @@ class DictConfigurator(BaseDictConfigurator):
     """
 
     @classmethod
-    def create_default(cls) -> dict[str, object]:
+    def create_default(
+        cls,
+        level: t.Optional[LoggingLevelOrName] = None,
+        formatter: t.Optional[str] = None,
+        handler: t.Optional[str] = None,
+        traceback_tail: t.Optional[int] = None,
+    ) -> dict[str, object]:
         """
         Return default configuration with predefined formatters, handlers and logging levels.
+
+        A few predefined formatters and handlers are available:
 
         Formatters:
 
@@ -61,7 +72,14 @@ class DictConfigurator(BaseDictConfigurator):
             * `stdout` -- log to stdout, uses `brief` formatter by default.
             * `stderr` -- log to stderr, uses `brief` formatter by default.
 
-        Default root logger level = WARNING; handler = stderr;
+        Default configuration can be overridden by providing custom values or environment variables.
+
+        Environment variables:
+
+            * `LOGGING__FORMATTER` -- default formatter name, (default `brief`)
+            * `LOGGING__HANDLER` -- default handler name, (default `stderr`)
+            * `LOGGING__LEVEL` -- default root logger level, (default `WARNING`)
+            * `LOGGING__TRACEBACK` -- default traceback tail length, (default `100`)
         """
         return {
             "version": 1,
@@ -69,44 +87,60 @@ class DictConfigurator(BaseDictConfigurator):
                 "brief": {
                     "()": f"{SoftFormatter.__module__}.{SoftFormatter.__name__}",
                     "fmt": "%(asctime)s %(levelname)-7s %(name)-50s %(message)s",
-                    "traceback_tail": 100,
+                    "traceback_tail": traceback_tail or int(os.getenv("LOGGING__TRACEBACK", "100")) or None,
                 },
                 "verbose": {
                     "()": f"{SoftFormatter.__module__}.{SoftFormatter.__name__}",
                     "fmt": "%(asctime)s|%(levelname)s|%(process)s|%(thread)s|%(taskName)s|%(name)s|%(self)s"
                     "|%(funcName)s|%(pathname)s:%(lineno)s|%(message)s",
-                    "traceback_tail": 100,
+                    "traceback_tail": None,
                 },
                 "json": {
                     "()": f"{JSONFormatter.__module__}.{JSONFormatter.__name__}",
-                    "traceback_tail": 100,
+                    "traceback_tail": traceback_tail or int(os.getenv("LOGGING__TRACEBACK", "100")) or None,
                 },
             },
             "handlers": {
                 "stdout": {
                     "class": "logging.StreamHandler",
-                    "formatter": "brief",
+                    "formatter": formatter or os.getenv("LOGGING__FORMATTER", "brief"),
                     "stream": "ext://sys.stdout",
                 },
                 "stderr": {
                     "class": "logging.StreamHandler",
-                    "formatter": "brief",
+                    "formatter": formatter or os.getenv("LOGGING__FORMATTER", "brief"),
                     "stream": "ext://sys.stderr",
                 },
             },
             "loggers": {},
             "root": {
-                "level": "WARNING",
-                "handlers": ["stderr"],
+                "level": level or os.getenv("LOGGING__LEVEL", "WARNING"),
+                "handlers": [handler or os.getenv("LOGGING__HANDLER", "stderr")],
             },
             "incremental": False,
             "disable_existing_loggers": False,
             "capture_warnings": True,
         }
 
-    def __init__(self, config: t.Optional[t.Mapping[str, object]] = None) -> None:
+    def __init__(
+        self,
+        config: t.Optional[t.Mapping[str, object]] = None,
+        level: t.Optional[LoggingLevelOrName] = None,
+        formatter: t.Optional[str] = None,
+        handler: t.Optional[str] = None,
+        traceback_tail: t.Optional[int] = None,
+    ) -> None:
         """Construct dict configurator."""
-        super().__init__(dict(config) if config else self.create_default())
+        super().__init__(
+            dict(config)
+            if config
+            else self.create_default(
+                formatter=formatter,
+                handler=handler,
+                level=level,
+                traceback_tail=traceback_tail,
+            )
+        )
 
     @override
     def configure(self) -> None:

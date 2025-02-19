@@ -22,7 +22,7 @@ _DEFAULT_CONFIG = DictConfigurator.create_default()
         ),
         pytest.param(
             {
-                "LOGGING.ROOT.LEVEL": "INFO",
+                "LOGGING__ROOT__LEVEL": "INFO",
             },
             None,
             {
@@ -33,8 +33,8 @@ _DEFAULT_CONFIG = DictConfigurator.create_default()
         ),
         pytest.param(
             {
-                "LOGGING.FORMATTERS.SIMPLE.()": "logging.StreamHandler",
-                "LOGGING.FORMATTERS.SIMPLE.FMT": "%(asctime)s %(message)s",
+                "LOGGING__FORMATTERS__SIMPLE__()": "logging.StreamHandler",
+                "LOGGING__FORMATTERS__SIMPLE__FMT": "%(asctime)s %(message)s",
             },
             None,
             {
@@ -51,7 +51,7 @@ _DEFAULT_CONFIG = DictConfigurator.create_default()
         ),
         pytest.param(
             {
-                "LOGGING.HANDLERS.STDOUT.FORMATTER": "verbose",
+                "LOGGING__HANDLERS__STDOUT__FORMATTER": "verbose",
             },
             None,
             {
@@ -76,7 +76,7 @@ _DEFAULT_CONFIG = DictConfigurator.create_default()
             id="yaml patch root level",
         ),
         pytest.param(
-            {"LOGGING.ROOT.LEVEL": "DEBUG"},
+            {"LOGGING__ROOT__LEVEL": "DEBUG"},
             {"root": {"level": "INFO"}},
             {
                 **_DEFAULT_CONFIG,
@@ -89,7 +89,7 @@ _DEFAULT_CONFIG = DictConfigurator.create_default()
 def test_config_from_envs(patch_envs: t.Mapping[str, str], expected_config: t.Mapping[str, object]) -> None:
     config = Config()
 
-    assert config.model_dump(by_alias=True, exclude_none=True) == expected_config
+    assert config.model_dump(by_alias=True) == expected_config
 
 
 @pytest.fixture
@@ -105,7 +105,7 @@ def patch_envs(
         monkeypatch.setenv(key, value)
 
     if logging_yaml is not None:
-        monkeypatch.setenv("LOGGING.FILE", str(logging_yaml))
+        monkeypatch.setenv("LOGGING__FILE", str(logging_yaml))
 
     return result_envs
 

@@ -17,7 +17,7 @@ from pydantic_settings import (
 )
 from typing_extensions import override
 
-from no_log_tears.config import DictConfigurator
+from no_log_tears.config import DictConfigurator, LoggingLevelName
 from no_log_tears.logger import _get_internal_logger
 
 
@@ -43,7 +43,7 @@ def _dump_logging_level(level: int) -> str:
 
 
 LoggingLevel = t.Annotated[
-    t.Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+    t.Union[int, LoggingLevelName],
     PlainValidator(_parse_logging_level),
     PlainSerializer(_dump_logging_level),
 ]
@@ -59,9 +59,9 @@ class Config(BaseSettings):
     """
     Logging configuration settings.
 
-    This class is used to configure logging system.
-    It supports multiple sources of configuration: environment variables with `LOGGING_` prefix, `.env` file, and
-    `.json`/`.yaml` files.
+    It supports multiple sources of configuration: environment variables with `LOGGING__` prefix, `.env` file, and
+    `.json`/`.yaml` files. Path to the file can be specified via `LOGGING__FILE` environment variable. By default, it
+    tries to load `logging.json` or `logging.yaml` from the current working directory.
 
     The configuration is based on Python's `logging.config.dictConfig` format. For more information see
     https://docs.python.org/3/library/logging.config.html
@@ -69,8 +69,8 @@ class Config(BaseSettings):
 
     model_config = SettingsConfigDict(
         env_file=".env",
-        env_prefix="logging.",
-        env_nested_delimiter=".",
+        env_prefix="LOGGING__",
+        env_nested_delimiter="__",
     )
 
     class Formatter(BaseModel):
@@ -126,12 +126,13 @@ class Config(BaseSettings):
             file_secret_settings,
         )
 
-        logging_files = cls.__normalize_paths(cls.__validate_path("logging.file")) or (
+        logging_files = cls.__normalize_paths(cls.__validate_path("LOGGING__FILE")) or (
             *cls.__normalize_paths(Path.cwd() / "logging.yaml"),
+            *cls.__normalize_paths(Path.cwd() / "logging.yml"),
             *cls.__normalize_paths(Path.cwd() / "logging.json"),
         )
 
-        _get_internal_logger().debug("logging files were normalized", logging_files=logging_files)
+        _get_internal_logger().info("logging files were normalized: %s", logging_files)
 
         return (
             base_sources
@@ -152,7 +153,7 @@ class Config(BaseSettings):
 
         path = Path(value).absolute()
         if not path.is_file():
-            warnings.warn(f"config file {path} is not valid (read from {name} env)", RuntimeWarning, stacklevel=1)
+            warnings.warn(f"config file {path} is not valid (read from {name} env)", RuntimeWarning, stacklevel=2)
             return None
 
         return path

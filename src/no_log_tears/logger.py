@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import typing as t
-from functools import cache
 
 from typing_extensions import override
 
@@ -82,7 +81,6 @@ class Logger(
 get_logger = Logger.get_by_name
 
 
-@cache
 def _get_internal_logger() -> Logger:
     log = get_logger(__name__)
 
@@ -101,8 +99,7 @@ def patch_logging() -> None:
         # `asctime` or `message` kwargs or extra keys.
         logging.getLoggerClass().makeRecord = _make_record  # type: ignore[assignment,method-assign]
 
-        log = _get_internal_logger()
-        log.debug("logging was patched")
+        _get_internal_logger().debug("logging was patched")
 
 
 # NOTE: ignore ARG001 and PLR0913, because this is a logging module patch.
