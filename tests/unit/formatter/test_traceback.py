@@ -90,7 +90,7 @@ def exc_info(stack: t.Optional[int]) -> ExceptionInfo:
         return None
 
     def build(n: int) -> None:
-        if n >= 2:
+        if n >= 2:  # noqa: PLR2004
             # Declare anonymous function and invoke it, so traceback package won't deduplicate lines.
             # This call doubles stack trace.
             def inner() -> None:
@@ -99,8 +99,8 @@ def exc_info(stack: t.Optional[int]) -> ExceptionInfo:
             inner()
         raise CustomError
 
-    with pytest.raises(CustomError) as exc_info:
-        if stack < 2:
+    with pytest.raises(CustomError) as exc_info:  # noqa: PT012
+        if stack < 2:  # noqa: PLR2004
             raise CustomError
 
         build(stack - 2)

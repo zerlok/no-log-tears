@@ -1,3 +1,5 @@
+"""Provides JSON logging formatter."""
+
 import json
 import logging
 import typing as t
@@ -6,28 +8,49 @@ from functools import singledispatchmethod
 
 from typing_extensions import override
 
+from no_log_tears.formatter.datetime import ISO8601DatetimeFormatter
 from no_log_tears.formatter.traceback import TracebackFormatter, TracebackGenerator
-from no_log_tears.formatter.utc import UTCTimeFormatter
 
 
 class JSONFormatter(TracebackFormatter):
+    """
+    Dumps all record fields to JSON.
+
+    `logging.LogRecord` fields conversions:
+
+        * `asctime` -- a date time string in ISO8601 format (with microseconds).
+        * `exc_text` -- a human-readable python traceback (multiline).
+
+    Other value conversions:
+
+        * `date` - to date string in ISO format.
+        * `time` - to time string in ISO format.
+        * `datetime` - to date time string in ISO format.
+        * `timedelta` - to python string representation.
+        * `tuple`, `set`, `frozenset` - to python list (to JSON array).
+
+    If type is unknown - uses `__str__`.
+    """
+
     def __init__(
         self,
         encoder: t.Optional[json.JSONEncoder] = None,
         traceback_tail: t.Optional[int] = None,
         traceback_generator: t.Optional[TracebackGenerator] = None,
     ) -> None:
+        """JSONFormatter constructor."""
         super().__init__()
         self.__encoder = (
             encoder
             if encoder is not None
             else json.JSONEncoder(check_circular=False, separators=(",", ":"), default=self.__encode_default)
         )
-        self.__time = UTCTimeFormatter()
+        self.__time = ISO8601DatetimeFormatter()
         self.__traceback = TracebackFormatter(traceback_tail=traceback_tail, traceback_generator=traceback_generator)
 
     @override
     def format(self, record: logging.LogRecord) -> str:
+        """Format given log record to JSON string."""
         if not hasattr(record, "asctime"):
             record.asctime = self.__time.formatTime(record)
 

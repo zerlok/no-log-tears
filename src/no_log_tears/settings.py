@@ -1,3 +1,5 @@
+"""Pydantic settings for logging configuration."""
+
 import logging
 import os
 import typing as t
@@ -16,7 +18,7 @@ from pydantic_settings import (
 from typing_extensions import override
 
 from no_log_tears.config import DictConfigurator
-from no_log_tears.logger import get_internal_logger
+from no_log_tears.logger import _get_internal_logger
 
 
 def _parse_logging_level(value: object) -> int:
@@ -24,7 +26,12 @@ def _parse_logging_level(value: object) -> int:
         return value
 
     elif isinstance(value, str):
-        return logging.getLevelName(value.strip().upper())
+        value_num = logging.getLevelName(value.strip().upper())
+        if not isinstance(value_num, int):
+            msg = "invalid log level"
+            raise TypeError(msg, value)
+
+        return value_num
 
     else:
         msg = "invalid log level"
@@ -41,7 +48,7 @@ LoggingLevel = t.Annotated[
     PlainSerializer(_dump_logging_level),
 ]
 
-_FILE_SOURCE_BY_SUFFIX: t.Final[t.Mapping[str, type[PydanticBaseSettingsSource]]] = {
+_FILE_SOURCE_BY_SUFFIX: t.Final[t.Mapping[str, t.Callable[[type[BaseSettings], Path], PydanticBaseSettingsSource]]] = {
     ".json": JsonConfigSettingsSource,
     ".yml": YamlConfigSettingsSource,
     ".yaml": YamlConfigSettingsSource,
@@ -49,6 +56,17 @@ _FILE_SOURCE_BY_SUFFIX: t.Final[t.Mapping[str, type[PydanticBaseSettingsSource]]
 
 
 class Config(BaseSettings):
+    """
+    Logging configuration settings.
+
+    This class is used to configure logging system.
+    It supports multiple sources of configuration: environment variables with `LOGGING_` prefix, `.env` file, and
+    `.json`/`.yaml` files.
+
+    The configuration is based on Python's `logging.config.dictConfig` format. For more information see
+    https://docs.python.org/3/library/logging.config.html
+    """
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_prefix="logging.",
@@ -56,20 +74,28 @@ class Config(BaseSettings):
     )
 
     class Formatter(BaseModel):
+        """Formatter settings."""
+
         model_config = ConfigDict(extra="allow")
 
         factory: t.Union[str, type[object]] = Field(alias="()")
 
     class Handler(BaseModel):
+        """Handler settings."""
+
         model_config = ConfigDict(extra="allow")
 
         class_: t.Union[str, type[object]] = Field(alias="class")
 
     class RootLogger(BaseModel):
+        """Root logger settings."""
+
         level: t.Optional[LoggingLevel] = None
         handlers: t.Optional[t.Sequence[str]] = None
 
     class Logger(RootLogger):
+        """Logger settings."""
+
         propagate: t.Optional[bool] = None
 
     version: t.Literal[1] = 1
@@ -91,6 +117,7 @@ class Config(BaseSettings):
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
+        """Customize settings sources."""
         base_sources = super().settings_customise_sources(
             settings_cls,
             init_settings,
@@ -104,7 +131,7 @@ class Config(BaseSettings):
             *cls.__normalize_paths(Path.cwd() / "logging.json"),
         )
 
-        get_internal_logger().debug("logging files were normalized", logging_files=logging_files)
+        _get_internal_logger().debug("logging files were normalized", logging_files=logging_files)
 
         return (
             base_sources
@@ -113,6 +140,7 @@ class Config(BaseSettings):
         )
 
     def configure(self) -> None:
+        """Configure logging."""
         DictConfigurator(self.model_dump(by_alias=True, exclude_none=True)).configure()
 
     @classmethod

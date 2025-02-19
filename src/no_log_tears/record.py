@@ -1,14 +1,26 @@
+"""Custom log record class."""
+
 from __future__ import annotations
 
 import logging
 import typing as t
-from types import TracebackType
+
+if t.TYPE_CHECKING:
+    from types import TracebackType
 
 
 class Record(logging.LogRecord):
+    """
+    Custom log record class with additional fields.
+
+    Additional fields can be passed as keyword arguments. They will be set as attributes of the record.
+    """
+
     # noinspection PyMethodParameters
     def __init__(
-        _self,
+        # NOTE: prefix all args with `_` and ignore N805, because `self` and other keys can be provided in keyword
+        # arguments.
+        _self,  # noqa:N805
         _name: str,
         _level: int,
         _pathname: str,
@@ -25,6 +37,7 @@ class Record(logging.LogRecord):
         _extra: t.Optional[t.Mapping[str, object]] = None,
         **kwargs: object,
     ) -> None:
+        """Create custom log record."""
         super().__init__(_name, _level, _pathname, _lineno, _msg, _args, _exc_info, _func, _sinfo)
 
         if _extra:

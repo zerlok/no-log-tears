@@ -40,7 +40,7 @@ _DEFAULT_CONFIG = DictConfigurator.create_default()
             {
                 **_DEFAULT_CONFIG,
                 "formatters": {
-                    **_DEFAULT_CONFIG["formatters"],
+                    **_DEFAULT_CONFIG["formatters"],  # type: ignore[dict-item]
                     "simple": {
                         "()": "logging.StreamHandler",
                         "fmt": "%(asctime)s %(message)s",
@@ -57,8 +57,11 @@ _DEFAULT_CONFIG = DictConfigurator.create_default()
             {
                 **_DEFAULT_CONFIG,
                 "handlers": {
-                    **_DEFAULT_CONFIG["handlers"],
-                    "stdout": {**_DEFAULT_CONFIG["handlers"]["stdout"], "formatter": "verbose"},
+                    **_DEFAULT_CONFIG["handlers"],  # type: ignore[dict-item]
+                    "stdout": {
+                        **_DEFAULT_CONFIG["handlers"]["stdout"],  # type: ignore[index]
+                        "formatter": "verbose",
+                    },
                 },
             },
             id="env patch stdout handler formatter",

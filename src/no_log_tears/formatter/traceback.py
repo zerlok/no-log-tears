@@ -1,3 +1,5 @@
+"""Provides traceback formatter."""
+
 import abc
 import logging
 import traceback
@@ -10,6 +12,8 @@ from typing_extensions import override
 
 
 class TracebackGenerator(t.Protocol):
+    """Interface to generate traceback parts from exception info."""
+
     @abc.abstractmethod
     def __call__(
         self,
@@ -17,19 +21,29 @@ class TracebackGenerator(t.Protocol):
         exc_value: BaseException,
         exc_traceback: TracebackType,
     ) -> t.Iterable[str]:
+        """Generate traceback parts from exception info."""
         raise NotImplementedError
 
 
 class TracebackFormatter(logging.Formatter):
-    def __init__(
+    """
+    Formatter to format traceback exception info to human-readable traceback.
+
+    Traceback lines are limited by `traceback_tail` parameter. If `traceback_tail` is `None` - no limit is applied.
+    Header and tail lines are always included. If traceback is limited - `... (xN stack frames)` line is added.
+    """
+
+    # NOTE: ignore PLR0913, because formatter can be constructed via dict configurator.
+    def __init__(  # noqa: PLR0913
         self,
         fmt: t.Optional[str] = None,
         datefmt: t.Optional[str] = None,
         style: t.Literal["%", "{", "$"] = "%",
-        validate: bool = True,
+        validate: bool = True,  # noqa: FBT001,FBT002
         traceback_tail: t.Optional[int] = None,
         traceback_generator: t.Optional[TracebackGenerator] = None,
     ) -> None:
+        """TracebackFormatter constructor."""
         super().__init__(fmt, datefmt, style, validate)
         self.__tail = traceback_tail + 1 if traceback_tail is not None else None
         self.__generator = traceback_generator if traceback_generator is not None else self.__generate_traceback
@@ -44,6 +58,7 @@ class TracebackFormatter(logging.Formatter):
             None,
         ],
     ) -> str:
+        """Format exception to human-readable traceback text."""
         if not isinstance(exc_info, tuple):
             return ""
 

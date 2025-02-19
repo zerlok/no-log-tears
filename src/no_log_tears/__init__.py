@@ -1,3 +1,5 @@
+"""Provides logging utilities & patches builtin `logging` library automatically."""
+
 __all__ = [
     "LogMixin",
     "LoggableMixin",

@@ -1,5 +1,7 @@
 import typing as t
 
+from typing_extensions import override
+
 from no_log_tears.mixin import LogMixin
 
 
@@ -24,5 +26,6 @@ class UserRegistry(LogMixin):
 
         return user_id
 
+    @override
     def _log_extra(self) -> t.Mapping[str, object]:
         return {"users_len": len(self.__users)}

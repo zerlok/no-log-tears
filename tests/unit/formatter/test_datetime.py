@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from no_log_tears.formatter.utc import UTCTimeFormatter
+from no_log_tears.formatter.datetime import ISO8601DatetimeFormatter
 from no_log_tears.record import Record
 
 
@@ -28,13 +28,13 @@ from no_log_tears.record import Record
         ),
     ],
 )
-def test_utc_ok(formatter: UTCTimeFormatter, record: Record, expected: str) -> None:
+def test_utc_ok(formatter: ISO8601DatetimeFormatter, record: Record, expected: str) -> None:
     assert formatter.formatTime(record) == expected
 
 
 @pytest.fixture
-def formatter() -> UTCTimeFormatter:
-    return UTCTimeFormatter()
+def formatter() -> ISO8601DatetimeFormatter:
+    return ISO8601DatetimeFormatter()
 
 
 @pytest.fixture

@@ -20,10 +20,10 @@ def test_logging_ok(
             "level": r.levelno,
             "message": r.message,
             "funcName": r.funcName,
-            "self": r.self,
-            "user_id": r.user_id,
-            "username": r.username,
-            "users_len": r.users_len,
+            "self": r.self,  # type: ignore[attr-defined]
+            "user_id": r.user_id,  # type: ignore[attr-defined]
+            "username": r.username,  # type: ignore[attr-defined]
+            "users_len": r.users_len,  # type: ignore[attr-defined]
         }
         for r in capture_logs.records
     ] == [

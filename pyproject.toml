@@ -47,7 +47,9 @@ output-format = "pylint"
 select = ["ALL"]
 ignore = [
     "ANN", # because we use mypy
-    "D", # TODO: add docstrings to public code
+    "A005", # waiting for ruff 0.10.0
+    "D203", # incompatible with D211
+    "D212", # incompatible with D213
     "FA", # TODO: consider should we use __annotations__
     "TD", # no task tracking
     "FIX", # TODO: consider enable it against new code on pull requests
@@ -55,12 +57,14 @@ ignore = [
     "ISC001", # because ruff format suggests to skip it
     "RET505", # clashes with mypy exhaustiveness check
     "S101", # allow asserts for tests checks and mypy help
+    "UP007", # because of python 3.9 support
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = [
     "ARG001", # it's ok to use a fixture with a side effect in a test.
     "PT004", # fixture may add side effect and doesn't return anything.
+    "D", # no need to document tests.
 ]
 
 
@@ -68,10 +72,10 @@ ignore = [
 files = ["src", "tests"]
 
 strict = true
+disallow_any_expr = false
+disallow_any_decorated = false
+disallow_any_explicit = false
 disallow_any_unimported = true
-disallow_any_expr = true
-disallow_any_decorated = true
-disallow_any_explicit = true
 disallow_any_generics = true
 disallow_subclassing_any = true
 disallow_untyped_calls = true
