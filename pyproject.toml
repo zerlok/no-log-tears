@@ -5,7 +5,7 @@ description = "NoLogTears is a simple extension of Python's built-in logging lib
 authors = ["zerlok <danil.troshnev@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "no_log_tears"}]
+packages = [{include = "no_log_tears", from = "src"}]
 keywords = [
     "python",
     "logging",
