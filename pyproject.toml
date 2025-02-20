@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "no-log-tears"
-version = "0.1.0"
+version = "0.2.0"
 description = "NoLogTears is a simple extension of Python's built-in logging library, designed to make logging easier, more efficient, and headache-free—no more tears over log management."
 authors = ["zerlok <danil.troshnev@gmail.com>"]
 license = "MIT"
@@ -65,6 +65,7 @@ ignore = [
     "ARG001", # it's ok to use a fixture with a side effect in a test.
     "PT004", # fixture may add side effect and doesn't return anything.
     "D", # no need to document tests.
+    "PLR0913", # pytest fixtures and test funcs may have a lot of parameters.
 ]
 
 

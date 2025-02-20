@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime, timezone
 
 import pytest
@@ -8,7 +7,7 @@ from no_log_tears.record import Record
 
 
 @pytest.mark.parametrize(
-    ("time", "expected"),
+    ("record_time", "expected"),
     [
         pytest.param(
             datetime(2025, 1, 1, tzinfo=timezone.utc),
@@ -35,13 +34,3 @@ def test_utc_ok(formatter: ISO8601DatetimeFormatter, record: Record, expected: s
 @pytest.fixture
 def formatter() -> ISO8601DatetimeFormatter:
     return ISO8601DatetimeFormatter()
-
-
-@pytest.fixture
-def record(time: datetime) -> Record:
-    rec = Record("test", logging.INFO, "path", 1, "test time")
-
-    rec.created = time.timestamp()
-    rec.msecs = (rec.created - int(rec.created)) * 1000
-
-    return rec

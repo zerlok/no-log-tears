@@ -1,5 +1,4 @@
 import json
-import logging
 import sys
 from unittest.mock import ANY
 
@@ -10,32 +9,26 @@ from no_log_tears.record import Record
 
 
 @pytest.mark.parametrize(
-    ("record", "expected_json"),
+    ("record_extra", "expected_json"),
     [
         pytest.param(
-            Record(
-                "foo",
-                logging.INFO,
-                "/path/to/file.py",
-                42,
-                "log message",
-            ),
+            {},
             {
                 "args": [],
                 "asctime": ANY,
                 "created": ANY,
                 "exc_info": None,
                 "exc_text": None,
-                "filename": "file.py",
+                "filename": "path.py",
                 "funcName": None,
                 "levelname": "INFO",
                 "levelno": 20,
                 "lineno": 42,
-                "module": "file",
+                "module": "path",
                 "msecs": ANY,
-                "msg": "log message",
-                "name": "foo",
-                "pathname": "/path/to/file.py",
+                "msg": "test-msg",
+                "name": "test-record-name",
+                "pathname": "/test/record/path.py",
                 "process": ANY,
                 "processName": "MainProcess",
                 "relativeCreated": ANY,
@@ -46,15 +39,7 @@ from no_log_tears.record import Record
             },
         ),
         pytest.param(
-            Record(
-                "foo",
-                logging.INFO,
-                "/path/to/file.py",
-                42,
-                "log message",
-                custom_key_1="custom_val_1",
-                custom_key_2={"spam": "eggs"},
-            ),
+            {"custom_key_1": "custom_val_1", "custom_key_2": {"spam": "eggs"}},
             {
                 "args": [],
                 "asctime": ANY,
@@ -63,16 +48,16 @@ from no_log_tears.record import Record
                 "custom_key_2": {"spam": "eggs"},
                 "exc_info": None,
                 "exc_text": None,
-                "filename": "file.py",
+                "filename": "path.py",
                 "funcName": None,
                 "levelname": "INFO",
                 "levelno": 20,
                 "lineno": 42,
-                "module": "file",
+                "module": "path",
                 "msecs": ANY,
-                "msg": "log message",
-                "name": "foo",
-                "pathname": "/path/to/file.py",
+                "msg": "test-msg",
+                "name": "test-record-name",
+                "pathname": "/test/record/path.py",
                 "process": ANY,
                 "processName": "MainProcess",
                 "relativeCreated": ANY,

@@ -66,7 +66,7 @@ handlers:
     stream: ext://sys.stdout
 formatters:
   custom:
-    (): no_log_tears.formatters.SomeFormatter
+    (): no_log_tears.formatters.SoftFormatter
     fmt: '%(asctime)s %(levelname)s %(message)s %(my_field)s %(__other__)s'
 ```
 
