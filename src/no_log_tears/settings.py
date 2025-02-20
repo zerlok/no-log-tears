@@ -55,7 +55,7 @@ _FILE_SOURCE_BY_SUFFIX: t.Final[t.Mapping[str, t.Callable[[type[BaseSettings], P
 }
 
 
-class Config(BaseSettings):
+class LoggingSettings(BaseSettings):
     """
     Logging configuration settings.
 

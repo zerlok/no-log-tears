@@ -43,12 +43,11 @@ pip install no-log-tears
 
 ## Usage
 
-Simple logging:
+Simple logging (execute python script with `LOGGING__LEVEL=INFO` environment variable):
 
 ```python
-from no_log_tears import get_logger, configure_logging, INFO
+from no_log_tears import get_logger
 
-configure_logging(level=INFO)
 log = get_logger(__name__)
 log.info("Hello, world!")
 # Output: `2025-02-19 20:42:28,928 INFO    __main__                                           Hello, world!`

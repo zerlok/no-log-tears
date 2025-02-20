@@ -6,7 +6,7 @@ import yaml
 from _pytest.monkeypatch import MonkeyPatch
 
 from no_log_tears.config import DictConfigurator
-from no_log_tears.settings import Config
+from no_log_tears.settings import LoggingSettings
 
 _DEFAULT_CONFIG = DictConfigurator.create_default()
 
@@ -87,9 +87,9 @@ _DEFAULT_CONFIG = DictConfigurator.create_default()
     ],
 )
 def test_config_from_envs(patch_envs: t.Mapping[str, str], expected_config: t.Mapping[str, object]) -> None:
-    config = Config()
+    settings = LoggingSettings()
 
-    assert config.model_dump(by_alias=True) == expected_config
+    assert settings.model_dump(by_alias=True) == expected_config
 
 
 @pytest.fixture
