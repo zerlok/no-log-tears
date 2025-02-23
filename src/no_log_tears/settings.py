@@ -71,6 +71,7 @@ class LoggingSettings(BaseSettings):
         env_file=".env",
         env_prefix="LOGGING__",
         env_nested_delimiter="__",
+        extra="allow",
     )
 
     class Formatter(BaseModel):
