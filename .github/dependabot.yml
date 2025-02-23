@@ -8,8 +8,7 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: sunday
+      interval: monthly
       time: "12:00"
     reviewers:
       - "zerlok"
