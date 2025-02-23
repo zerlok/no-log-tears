@@ -7,6 +7,12 @@ import pytest
 
 from no_log_tears.record import Record
 
+ExcInfo = t.Union[
+    tuple[type[BaseException], BaseException, TracebackType],
+    tuple[None, None, None],
+    None,
+]
+
 
 @pytest.fixture
 def record_timezone() -> t.Optional[timezone]:
@@ -49,7 +55,7 @@ def record_args() -> tuple[object, ...]:
 
 
 @pytest.fixture
-def record_exc_info() -> tuple[type[BaseException], BaseException, TracebackType] | tuple[None, None, None] | None:
+def record_exc_info() -> ExcInfo:
     return None
 
 
@@ -82,7 +88,7 @@ def record(
     record_line: int,
     record_msg: str,
     record_args: tuple[object, ...],
-    record_exc_info: tuple[type[BaseException], BaseException, TracebackType] | tuple[None, None, None] | None,
+    record_exc_info: ExcInfo,
     record_func: t.Optional[str],
     record_sinfo: t.Optional[str],
     record_extra: t.Mapping[str, object],
