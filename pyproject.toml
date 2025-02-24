@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "no-log-tears"
-version = "0.2.0"
+version = "0.2.1"
 description = "NoLogTears is a simple extension of Python's built-in logging library, designed to make logging easier, more efficient, and headache-free—no more tears over log management."
 authors = ["zerlok <danil.troshnev@gmail.com>"]
 license = "MIT"
